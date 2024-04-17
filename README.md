@@ -13,7 +13,7 @@ This is a repository containing code for Mailchimp Homework Assignment.
 - Check the output in ```output_html.html``` file.
 
 ## How to run unit tests and check code coverage
-- Run `mvn clean install`
-- Check the code coverage in ```target/site/jacoco/index.html```
+- Run `mvn clean install`.
+- Check the code coverage in ```target/site/jacoco/index.html```.
 
 
