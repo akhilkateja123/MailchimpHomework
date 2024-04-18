@@ -4,6 +4,9 @@ public class HeadingParser implements MarkdownParser {
     private static final String MARKDOWN_PATTERN = "^[#]{1,6}[\\s].+";
     private static final String HTML_FORMAT = "<h%d>%s</h%d>";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String parseAndTransform(String line) {
         if (line.matches(MARKDOWN_PATTERN)) {

@@ -10,7 +10,9 @@ public class HyperlinkParser implements MarkdownParser {
     private static final String HTML_FORMAT_WITHOUT_TILE = "%s<a href=\"%s\">%s</a>%s";
     private static final String HTML_FORMAT_WITH_TILE = "%s<a href=\"%s\" title=\"%s\">%s</a>%s";
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String parseAndTransform(String line) {
         Pattern pattern = Pattern.compile(MARKDOWN_PATTERN_WITH_TITLE);
