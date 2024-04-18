@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class MarkDownToHtmlConverterTest {
+class MarkDownToHtmlConverterTest {
 
     private final List<String> inputs = List.of(
             //Input#1
@@ -82,7 +82,7 @@ public class MarkDownToHtmlConverterTest {
 
 
     @Test
-    public final void testMarkdowns() {
+    void testMarkdowns() {
         // Arrange
         for (int i = 0; i < inputs.size(); i++) {
             //Act

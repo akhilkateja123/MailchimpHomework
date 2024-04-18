@@ -12,7 +12,7 @@ public class HyperlinkParser implements MarkdownParser {
 
 
     @Override
-    public String parse(String line) {
+    public String parseAndTransform(String line) {
         Pattern pattern = Pattern.compile(MARKDOWN_PATTERN_WITH_TITLE);
         Matcher matcher = pattern.matcher(line);
         while (matcher.matches()) {

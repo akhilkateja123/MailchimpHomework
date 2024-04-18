@@ -6,7 +6,7 @@ public class ParagraphParser implements MarkdownParser {
     private static final String ELEMENT = "p";
 
     @Override
-    public String parse(String line) {
+    public String parseAndTransform(String line) {
         return String.format(HTML_OPEN_FORMAT, ELEMENT, line);
     }
 

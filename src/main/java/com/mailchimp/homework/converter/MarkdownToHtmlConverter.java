@@ -14,8 +14,8 @@ public class MarkdownToHtmlConverter {
     }
 
     private List<String> convertedLines;
-    private Boolean isParagraphOpen;
-    private Boolean isMatchSuccess;
+    private boolean isParagraphOpen;
+    private boolean isMatchSuccess;
 
     /**
      * Converts the input markdown to HTML.
@@ -25,16 +25,16 @@ public class MarkdownToHtmlConverter {
      */
     public String convertMarkdownToHtml(String markdownText) {
         convertedLines = new ArrayList<>();
-        isParagraphOpen = Boolean.FALSE;
+        isParagraphOpen = false;
         int index = 0;
 
         for (String line : markdownText.split("\n")) {
-            isMatchSuccess = Boolean.TRUE;
+            isMatchSuccess = true;
             line = evaluateHtmlElements(line);
 
             if (isMatchSuccess && isParagraphOpen) {
                 closeParagraphTag(index - 1);
-                isParagraphOpen = Boolean.FALSE;
+                isParagraphOpen = false;
             }
             convertedLines.add(index++, line);
         }
@@ -62,11 +62,11 @@ public class MarkdownToHtmlConverter {
             return line;
         }
         // Links
-        line = getParser(MarkdownType.HYPERLINK).parse(line);
+        line = getParser(MarkdownType.HYPERLINK).parseAndTransform(line);
 
         // Heading
         String nonConvertedLine = line;
-        line = getParser(MarkdownType.HEADING).parse(line);
+        line = getParser(MarkdownType.HEADING).parseAndTransform(line);
         if (!line.equals(nonConvertedLine)) {
             return line;
         }
@@ -75,13 +75,19 @@ public class MarkdownToHtmlConverter {
 
         //Paragraph
         if (!isParagraphOpen) {
-            line = getParser(MarkdownType.PARAGRAPH).parse(line);
+            line = getParser(MarkdownType.PARAGRAPH).parseAndTransform(line);
             isParagraphOpen = Boolean.TRUE;
         }
 
         return line;
     }
 
+    /**
+     * Returns the corresponding parser to the markdown type.
+     *
+     * @param markdownType Markdown type.
+     * @return Parser.
+     */
     private MarkdownParser getParser(MarkdownType markdownType) {
         if (markdownType == MarkdownType.HYPERLINK) {
             return new HyperlinkParser();

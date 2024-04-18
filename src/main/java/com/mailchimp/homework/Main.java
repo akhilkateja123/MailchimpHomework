@@ -31,11 +31,10 @@ public class Main {
                 if (line == null) {
                     break;
                 }
-                content = String.format("%s%s\n", content, line);
+                content = String.format("%s%s%n", content, line);
             }
 
         } catch (Exception error) {
-            System.out.println(error);
             error.printStackTrace();
         }
         return content;
@@ -51,7 +50,6 @@ public class Main {
             writer.write(content);
             writer.flush();
         } catch (Exception error) {
-            System.out.println(error);
             error.printStackTrace();
         }
     }
