@@ -1,14 +1,21 @@
 package com.mailchimp.homework.converter;
 
+import com.mailchimp.homework.parser.HeadingParser;
+import com.mailchimp.homework.parser.HyperlinkParser;
+import com.mailchimp.homework.parser.MarkdownParser;
+import com.mailchimp.homework.parser.ParagraphParser;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MarkdownToHtmlConverter {
-    private static final List<String> openHtmlElements = new ArrayList<>();
-    private static List<String> convertedLines;
-    private static Boolean matchSuccess;
+    enum MarkdownType {
+        HYPERLINK, HEADING, PARAGRAPH;
+    }
+
+    private List<String> convertedLines;
+    private Boolean isParagraphOpen;
+    private Boolean isMatchSuccess;
 
     /**
      * Converts the input markdown to HTML.
@@ -16,24 +23,24 @@ public class MarkdownToHtmlConverter {
      * @param markdownText Markdown text to be converted.
      * @return Converted HTML.
      */
-    public static String convertMarkdownToHtml(String markdownText) {
+    public String convertMarkdownToHtml(String markdownText) {
         convertedLines = new ArrayList<>();
+        isParagraphOpen = Boolean.FALSE;
         int index = 0;
 
         for (String line : markdownText.split("\n")) {
-            matchSuccess = Boolean.TRUE;
+            isMatchSuccess = Boolean.TRUE;
             line = evaluateHtmlElements(line);
 
-            if (!matchSuccess) {
-                line = processParagraph(line);
-            } else if (!openHtmlElements.isEmpty()) {
-                closeRemainingHtmlTags(index - 1);
+            if (isMatchSuccess && isParagraphOpen) {
+                closeParagraphTag(index - 1);
+                isParagraphOpen = Boolean.FALSE;
             }
             convertedLines.add(index++, line);
         }
 
-        if (!openHtmlElements.isEmpty())
-            closeRemainingHtmlTags(index - 1);
+        if (isParagraphOpen)
+            closeParagraphTag(index - 1);
 
         StringBuilder convertedText = new StringBuilder();
         for (String convertedLine : convertedLines) {
@@ -49,81 +56,40 @@ public class MarkdownToHtmlConverter {
      * @param line Line from input.
      * @return Converted Line (if matched to one of the HTML elements).
      */
-    private static String evaluateHtmlElements(String line) {
+    private String evaluateHtmlElements(String line) {
         // Empty line
         if (line.trim().isEmpty() || line.trim().equals("...")) {
             return line;
         }
-
         // Links
-        line = processLinks(line);
-
-        String nonConvertedLine = line;
+        line = getParser(MarkdownType.HYPERLINK).parse(line);
 
         // Heading
-        line = processHeaders(line);
+        String nonConvertedLine = line;
+        line = getParser(MarkdownType.HEADING).parse(line);
         if (!line.equals(nonConvertedLine)) {
             return line;
         }
 
-        matchSuccess = Boolean.FALSE;
+        isMatchSuccess = Boolean.FALSE;
 
-        return line;
-    }
-
-    /**
-     * Process hyperlinks.
-     *
-     * @param line Input line.
-     * @return Converted line if matches one of the patterns.
-     */
-    private static String processLinks(String line) {
-        Pattern pattern = Pattern.compile("(.*)\\[(.+)\\]\\((.+) \"(.*)\"\\)(.*)");
-        Matcher matcher = pattern.matcher(line);
-        while (matcher.matches()) {
-            line = String.format("%s<a href=\"%s\" title=\"%s\">%s</a>%s", matcher.group(1), matcher.group(3), matcher.group(4), matcher.group(2), matcher.group(5));
-            matcher = pattern.matcher(line);
-        }
-
-        pattern = Pattern.compile("(.*)\\[(.+)\\]\\((.+)\\)(.*)");
-        matcher = pattern.matcher(line);
-        while (matcher.matches()) {
-            line = String.format("%s<a href=\"%s\">%s</a>%s", matcher.group(1), matcher.group(3), matcher.group(2), matcher.group(4));
-            matcher = pattern.matcher(line);
+        //Paragraph
+        if (!isParagraphOpen) {
+            line = getParser(MarkdownType.PARAGRAPH).parse(line);
+            isParagraphOpen = Boolean.TRUE;
         }
 
         return line;
     }
 
-    /**
-     * Process headings.
-     *
-     * @param line Input line.
-     * @return Converted line if matches one of the patterns.
-     */
-    private static String processHeaders(String line) {
-        if (line.matches("^[#]{1,6}[\\s].+")) {
-            long titleNum = line.replaceFirst("(^[#]{1,6})[\\s].+", "$1").chars().count();
-            if (titleNum < 7) {
-                line = String.format("<h%d>%s</h%d>", titleNum, line.replaceFirst("^([#]){1,6}[\\s]", ""), titleNum);
-            }
+    private MarkdownParser getParser(MarkdownType markdownType) {
+        if (markdownType == MarkdownType.HYPERLINK) {
+            return new HyperlinkParser();
+        } else if (markdownType == MarkdownType.HEADING) {
+            return new HeadingParser();
         }
-        return line;
-    }
 
-    /**
-     * Process unformatted text.
-     *
-     * @param line Input line.
-     * @return Converted line.
-     */
-    private static String processParagraph(String line) {
-        String element = "p";
-        if (isHtmlElementListEmpty(element)) {
-            openHtmlElements.add(element);
-            return String.format("<%s>%s", element, line);
-        }
-        return line;
+        return new ParagraphParser();
     }
 
     /**
@@ -131,25 +97,10 @@ public class MarkdownToHtmlConverter {
      *
      * @param lineIndex Index of the line in the converted lines list.
      */
-    private static void closeRemainingHtmlTags(int lineIndex) {
-        StringBuilder closingTags = new StringBuilder();
-        closingTags.append(convertedLines.get(lineIndex));
-
-        for (String element : openHtmlElements) {
-            closingTags.append(String.format("</%s>", element));
-        }
-        openHtmlElements.clear();
+    private void closeParagraphTag(int lineIndex) {
+        String line = ((ParagraphParser) getParser(MarkdownType.PARAGRAPH)).
+                close(convertedLines.get(lineIndex));
         convertedLines.remove(lineIndex);
-        convertedLines.add(lineIndex, closingTags.toString());
-    }
-
-    /**
-     * Checks if the list of open HTML elements contains the passed element.
-     *
-     * @param element HTML element to be searched.
-     * @return True if the list of open HTML elements does not contain the passed element.
-     */
-    private static boolean isHtmlElementListEmpty(String element) {
-        return openHtmlElements.stream().noneMatch(e -> e.equals(element));
+        convertedLines.add(lineIndex, line);
     }
 }

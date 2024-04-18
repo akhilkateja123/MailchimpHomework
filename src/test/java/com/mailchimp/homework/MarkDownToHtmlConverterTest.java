@@ -86,7 +86,7 @@ public class MarkDownToHtmlConverterTest {
         // Arrange
         for (int i = 0; i < inputs.size(); i++) {
             //Act
-            String outputHtml = MarkdownToHtmlConverter.convertMarkdownToHtml(inputs.get(i));
+            String outputHtml = new MarkdownToHtmlConverter().convertMarkdownToHtml(inputs.get(i));
             //Assert
             Assertions.assertTrue(outputHtml.contains(outputs.get(i)));
         }

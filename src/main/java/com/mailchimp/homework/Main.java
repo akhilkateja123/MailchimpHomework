@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         String inputMarkdown = readInputMarkdownFromFile(INPUT_FILE);
-        String outputHtml = MarkdownToHtmlConverter.convertMarkdownToHtml(inputMarkdown);
+        String outputHtml = new MarkdownToHtmlConverter().convertMarkdownToHtml(inputMarkdown);
         writeOutputHtmlToFile(OUTPUT_FILE, outputHtml);
     }
 

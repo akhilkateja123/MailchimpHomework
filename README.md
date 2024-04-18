@@ -9,7 +9,7 @@ This is a repository containing code for Mailchimp Homework Assignment.
 ## How to run the code
 - Import the code as a Maven project.
 - Paste the input markdown in the file ```input_markdown.md```.
-- Run the Mail class.
+- Run the Main class.
 - Check the output in ```output_html.html``` file.
 
 ## How to run unit tests and check code coverage

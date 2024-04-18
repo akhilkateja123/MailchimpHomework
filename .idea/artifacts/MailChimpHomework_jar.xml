@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MailChimpHomework:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MailChimpHomework_jar</output-path>
+    <root id="archive" name="MailChimpHomework.jar">
+      <element id="module-output" name="MailChimpHomework" />
+    </root>
+  </artifact>
+</component>
