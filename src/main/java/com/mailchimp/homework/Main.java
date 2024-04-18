@@ -25,8 +25,7 @@ public class Main {
     private static String readInputMarkdownFromFile(String path) {
         String content = "";
         String line;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(path));
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             while (true) {
                 line = reader.readLine();
                 if (line == null) {
@@ -48,12 +47,9 @@ public class Main {
      * @param path Input file path.
      */
     private static void writeOutputHtmlToFile(String path, String content) {
-        try {
-            FileWriter writer = new FileWriter(path);
+        try (FileWriter writer = new FileWriter(path)) {
             writer.write(content);
             writer.flush();
-            writer.close();
-
         } catch (Exception error) {
             System.out.println(error);
             error.printStackTrace();
